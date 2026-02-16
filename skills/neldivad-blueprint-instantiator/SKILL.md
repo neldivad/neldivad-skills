@@ -46,10 +46,23 @@ Create a new SaaS project from blueprint templates with phased architecture plan
 
 ### Phase 0: Setup
 
-1. Create the project directory structure above
-2. Copy all templates from [references/saas-blueprint/](references/saas-blueprint/) into `<project-name>/blueprint/`
-3. Create empty `saves/` directory
-4. Update `00-state.md` with the project path and current position
+1. Determine `SKILL_DIR` — the directory containing this SKILL.md file
+2. Create the project directory structure:
+   ```
+   mkdir -p <project-name>/blueprint/saves
+   mkdir -p <project-name>/.claude/skills
+   mkdir -p <project-name>/src
+   ```
+3. **Copy templates from skill references to blueprint/**:
+   ```
+   cp ${SKILL_DIR}/references/saas-blueprint/*.md <project-name>/blueprint/
+   ```
+   This creates a working copy. The originals in `references/saas-blueprint/` stay untouched as the canonical templates. The copies in `blueprint/` are what get filled in per-project.
+4. Update `blueprint/00-state.md` with:
+   - Blueprint path → `<project-name>/blueprint/`
+   - Skills path → `<project-name>/.claude/skills/`
+   - Phase → 0 (Setup) — complete
+   - What's next → Phase 1
 5. Verify required external skills are installed:
    - `find-skills` (from vercel-labs/skills)
    - If missing, prompt user to install: `npx skills add vercel-labs/skills@find-skills -g -y`
