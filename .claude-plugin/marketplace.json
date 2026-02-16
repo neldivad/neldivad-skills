@@ -1,0 +1,22 @@
+{
+  "name": "neldivad-skills",
+  "owner": {
+    "name": "neldivad",
+    "email": ""
+  },
+  "metadata": {
+    "description": "Blueprint-driven SaaS development skills. Creates architecture docs before code, discovers stack-specific skills, then builds.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "saas-builder-skills",
+      "description": "Skills for bootstrapping and building SaaS applications from blueprints",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/neldivad-blueprint-instantiator"
+      ]
+    }
+  ]
+}
