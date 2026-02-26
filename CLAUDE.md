@@ -39,8 +39,8 @@ These skills are not bundled — install them separately:
 
 Install with:
 ```bash
-npx skills add vercel-labs/skills@find-skills -g -y
-npx skills add anthropics/skills@skill-creator -g -y
+npx skills add vercel-labs/skills@find-skills -g
+npx skills add anthropics/skills@skill-creator -g
 ```
 
 ## Workflow
