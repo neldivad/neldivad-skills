@@ -1,6 +1,7 @@
 # Milestones
-<!-- version: 0.1 | phase: 3 | last-updated: YYYY-MM-DD -->
+<!-- version: 0.2 | phase: 3 | last-updated: YYYY-MM-DD -->
 <!-- changelog:
+  v0.2 - Expanded New Game+ with backlog triage, scope queue intake, campaign complete section
   v0.1 - Initial milestone plan from Phase 3
 -->
 
@@ -21,7 +22,13 @@
 
 ```
 M0: Project Setup ─────► M1: Auth ─────► M2: Core CRUD ─────► M3: Payments ─────► M4: Polish ─────► LAUNCH
-     (tutorial)           (unlock)         (main quest)          (boss fight)        (side quests)
+     (tutorial)           (unlock)         (main quest)          (boss fight)        (side quests)       │
+                                                                                                          │
+                                                                                              ┌───────────┘
+                                                                                              ▼
+                                                                                     NEW GAME+
+                                                                                     M5, M6, M7...
+                                                                                     (backlog queue)
 ```
 
 ## M0: Project Scaffold (Tutorial Zone)
@@ -140,20 +147,103 @@ M0: Project Setup ─────► M1: Auth ─────► M2: Core CRUD �
 
 ---
 
-## Post-Launch Milestones (New Game+)
+---
+
+## Campaign Complete
 
 <!--
-  AI INSTRUCTION: Pull from 01-prd.md "Explicitly Out of Scope" and
-  01-mvp-reduction-checklist.md "Cut Features" to plan post-launch milestones.
+  AI INSTRUCTION: When M4 Review Gate is approved and production smoke tests pass,
+  run this section in order. This is the credits roll.
 -->
 
-### M5: Post-MVP Features
+**Win condition:** App is deployed, paying users can sign up, core CRUD works, payments process.
 
-| Feature | Priority | Dependencies |
+### Credits Roll Checklist
+
+| Task | Status |
+|---|---|
+| Production URL resolves | |
+| Sign up → onboard → dashboard flow works end-to-end | |
+| Payment checkout completes with real card (or test mode confirmed) | |
+| All smoke tests pass on production | |
+| `00-state.md` marked: Phase → SHIPPED | |
+| Final save written to `saves/gate-4-shipped.md` | |
+| `changelog.md` entry: "v1.0 — shipped" | |
+
+**When all checked:** Tell the human:
+
+```
+Campaign complete. The MVP is live.
+
+Here's what shipped: [one paragraph summary from 01-prd.md core value prop]
+Here's what was cut: [list from 01-mvp-reduction-checklist.md]
+Here's what's queued: [Scope Queue + Backlog count]
+
+When you're ready to continue, say "New Game+" and we'll triage the backlog.
+```
+
+Then stop. Do not start New Game+ work until the human explicitly says so.
+
+---
+
+## New Game+ (Post-Launch Backlog)
+
+<!--
+  AI INSTRUCTION:
+  This section is populated from two sources:
+  1. Features cut during Phase 1 (01-mvp-reduction-checklist.md)
+  2. Scope Queue items that received "Backlog" verdict during the campaign
+
+  New Game+ milestones follow the same rules as M0-M4:
+  - Each needs a done condition
+  - Each needs a blast radius check before starting
+  - Each needs human approval at its own gate
+  - Number them M5, M6, M7... in order of priority
+
+  To start New Game+:
+  1. Pull all Backlog items from Scope Queue in 00-state.md
+  2. Pull all cut features from 01-mvp-reduction-checklist.md
+  3. Present the full list to human for triage
+  4. Human assigns priority order
+  5. Generate M5, M6... milestones below using the same format as M0-M4
+-->
+
+### Backlog Intake
+
+When entering New Game+, run this triage with the human:
+
+**From the cut list** — pull every row from `01-mvp-reduction-checklist.md` marked "Cut":
+
+| Feature | Why Cut | Still Needed? | Priority |
+|---|---|---|---|
+| (populate from mvp-reduction-checklist.md) | | | |
+
+**From the Scope Queue** — pull every item from `00-state.md` Scope Queue with verdict "Backlog":
+
+| Request | Date Logged | Priority |
 |---|---|---|
-| (from cut features list) | | |
-| | | |
-| | | |
+| (populate from 00-state.md scope queue) | | |
+
+**Triage rules:**
+- Assign each item: `ship-next` / `ship-later` / `never`
+- Items marked `never` get archived — remove from queue, note why in changelog
+- Items marked `ship-next` become the next numbered milestone (M5, M6...)
+- Items marked `ship-later` stay in backlog
+
+### M5+: (Generated from Backlog)
+
+<!--
+  AI INSTRUCTION: Generate milestone blocks here, one per approved backlog item.
+  Use the same format as M0-M4 above. Each block needs:
+  - Dependencies
+  - Implements (which 02-*.md files, or note if docs need updating first)
+  - Task table
+  - Done when
+  - Review Gate
+
+  Before writing code for any M5+ milestone, run Impact Assessment from
+  00-game-rules.md. If it requires updating any 02-*.md, do that first.
+-->
 
 ---
 
@@ -166,3 +256,5 @@ M0: Project Setup ─────► M1: Auth ─────► M2: Core CRUD �
 | M2: Core CRUD | not started | | | |
 | M3: Payments | not started | | | |
 | M4: Polish | not started | | | |
+| — LAUNCH — | | | | |
+| M5+: (backlog) | not started | | | |

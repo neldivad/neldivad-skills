@@ -1,16 +1,23 @@
 ---
 name: neldivad-blueprint-instantiator
-description: Bootstraps a new SaaS project from blueprint templates. Runs phased Q&A to extract the idea, fills architecture docs, discovers stack-specific skills, and prepares the project for building. Use when user says "new project", "start a SaaS", "instantiate blueprint", or "bootstrap <name>".
+description: Bootstraps a new SaaS project from blueprint templates, or resumes an existing one. Runs phased Q&A to extract the idea, fills architecture docs, discovers stack-specific skills, and prepares the project for building. Use when user says "new project", "start a SaaS", "instantiate blueprint", "bootstrap <name>", "resume <name>", "continue <name>", or "load <name>".
 disable-model-invocation: true
 ---
 
 # Blueprint Instantiator
 
-Create a new SaaS project from blueprint templates with phased architecture planning.
+Create a new SaaS project from blueprint templates, or resume an existing one mid-campaign.
 
 ## Usage
 
 ```bash
+# Start a new project
+/neldivad-blueprint-instantiator new <project-name>
+
+# Resume an existing project (any stage — blueprint or build)
+/neldivad-blueprint-instantiator resume <project-name>
+
+# Shorthand — if <project-name> directory already exists, treats as resume
 /neldivad-blueprint-instantiator <project-name>
 ```
 
@@ -128,6 +135,99 @@ Only after Gate 3 approval:
 2. Create `src/` directory
 3. Begin Milestone 1 from `03-milestones.md`
 
+---
+
+## Resume Path (Continue Game)
+
+Used when: project already exists, blueprint is partially or fully complete,
+and the human wants to pick up where they left off.
+
+### Step 1 — Detect Mode
+
+When invoked with `resume <project-name>` or when `<project-name>/blueprint/` already exists:
+
+```
+1. Read <project-name>/blueprint/00-state.md
+2. Read <project-name>/blueprint/00-game-rules.md
+3. Read <project-name>/blueprint/00-variables.md
+4. Identify current phase and milestone from 00-state.md
+```
+
+Do NOT run Q&A. Do NOT re-copy templates. Do NOT reset variables.
+
+### Step 2 — Orient and Report
+
+Print a load screen to the human:
+
+```
+Loading: <PROJECT_NAME>
+─────────────────────────────
+Phase:     [current phase from 00-state.md]
+Milestone: [current milestone, or "Blueprint phase — no milestone yet"]
+Status:    [last known status]
+Blockers:  [any blockers listed in 00-state.md, or "none"]
+Scope Queue: [count of pending items, or "empty"]
+─────────────────────────────
+Last session: [date from 00-session-log.md, last entry]
+Handoff note: [verbatim from 00-state.md Handoff section]
+─────────────────────────────
+Ready. Continuing from: [What's Next from 00-state.md]
+```
+
+Then wait for the human to confirm or redirect. Do not start working until confirmed.
+
+### Step 3 — Route to Correct Phase
+
+Based on `00-state.md`, jump directly to the right place:
+
+| State found in 00-state.md | Resume action |
+|---|---|
+| Phase 0 complete, awaiting Phase 1 | Start Phase 1 Q&A |
+| Phase 1 in progress | Resume Q&A from last answered question |
+| Gate 1 passed, Phase 2 not started | Start Phase 2 architecture docs |
+| Phase 2 in progress | Resume filling the next unfinished `02-*.md` |
+| Gate 2 passed, skills not installed | Run Phase 2.5 skill discovery |
+| Gate 3 passed, build not started | Run Post-Blueprint setup, begin M0 |
+| Milestone in progress | Run Game Loop from current incomplete task |
+| Milestone complete, gate pending | Present Review Gate summary |
+| SHIPPED | Present Campaign Complete summary, offer New Game+ triage |
+
+### Step 4 — Handle Corrupted or Missing State
+
+If `00-state.md` is missing or unreadable:
+```
+1. Check saves/ for the most recent gate snapshot
+2. Tell the human: "00-state.md is missing. Found save: gate-N-description.md.
+   Restore from this save? (yes/no)"
+3. If yes: restore state from the save file, then resume normally
+4. If no: ask human to describe where they are, reconstruct 00-state.md manually
+```
+
+If blueprint directory doesn't exist at the given path:
+```
+"No blueprint found at <project-name>/blueprint/.
+ Did you mean to start a new project? Run:
+ /neldivad-blueprint-instantiator new <project-name>"
+```
+
+### Load Gate (Manual Rollback)
+
+Human can say "load gate-N" at any time during a resume session:
+
+```
+1. Read saves/gate-N-*.md
+2. Show the human what state that save represents:
+   "Gate N — [description]. Phase: X. Variables set: Y. Files at this point: Z."
+3. Confirm: "Roll back to this save? This will reset 00-state.md and any
+   02-*.md files modified after this gate. (yes/no)"
+4. If yes:
+   a. Restore 00-state.md to the saved state
+   b. Restore any 02-*.md files listed in the save
+   c. Append to 00-session-log.md: "[DATE] Rolled back to gate-N"
+   d. Resume from that gate's "What's Next"
+5. If no: continue current session unchanged
+```
+
 ## Template Reference
 
 All templates are in [references/saas-blueprint/](references/saas-blueprint/):
@@ -154,10 +254,17 @@ All templates are in [references/saas-blueprint/](references/saas-blueprint/):
 | [03-cursorrules.md](references/saas-blueprint/03-cursorrules.md) | 3 | Generated Cursor rules |
 | [03-claude-md.md](references/saas-blueprint/03-claude-md.md) | 3 | Generated CLAUDE.md |
 
+## Extending the Harness
+
+See [MODDING.md](MODDING.md) for how to add phases, templates, variables, or change
+game rules without breaking the save system or existing projects.
+
 ## Important Rules
 
 - **Never skip a gate.** Each phase requires human approval.
 - **Never write code during blueprint phases.** Docs first.
 - **CTO pushback mode.** Challenge scope creep, default to NO on nice-to-haves.
+- **Scope queue, not scope block.** Mid-milestone requests get logged, not acted on.
 - **Sync check.** When any 02-*.md changes, verify all others are consistent.
 - **Variables.** All `{{PLACEHOLDERS}}` in templates must resolve from `00-variables.md`.
+- **Resume never resets.** The resume path reads state — it never re-runs setup or Q&A.
